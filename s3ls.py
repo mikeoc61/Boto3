@@ -3,7 +3,7 @@
 # Simply python2 code to provide a listing of available S3 buckets or if
 # passed a command line argument, list the contents of that specific bucket
 
-__author__      = "Michael E O'Connor"
+__author__      = "Michael E. O'Connor"
 __copyright__   = "Copyright 2017"
 
 import sys
