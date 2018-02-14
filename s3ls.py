@@ -17,9 +17,8 @@ def s3ls_all():
 
    s3 = boto3.client('s3')
    response = s3.list_buckets()
-#  buckets = [bucket['Name'] for bucket in response['Buckets']]
    for bucket in response['Buckets']:
-       print bucket['Name']
+       print ("%s %s" % (bucket['CreationDate'], bucket['Name']))
 
    return 1
 
