@@ -11,7 +11,7 @@ import boto3
 import botocore
 
 
-# Display list of file all S3 buckets associated with user credentials
+# Display list of all S3 buckets associated with user credentials
 
 def s3ls_all():
 
@@ -50,7 +50,7 @@ def main():
     # we need to check to see if the bucket name is valid and readable
     # before proceeding
 
-    if len(sys.argv) == 2: 
+    if len(sys.argv) == 2:
         arg = sys.argv[1]
     else:
         print ("Sorry, this sad little program only accepts a single command line argument")
