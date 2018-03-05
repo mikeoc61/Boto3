@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-# Python2 code to provide a listing of available AWS S3 buckets or if
+# Python code to provide a listing of available AWS S3 buckets or if
 # passed a command line argument, list the contents of that specific bucket
 
 __author__      = "Michael E. O'Connor"
@@ -9,7 +9,6 @@ __copyright__   = "Copyright 2018"
 import sys
 import boto3
 import botocore
-
 
 # Display list of all S3 buckets associated with user credentials
 
@@ -29,7 +28,7 @@ def s3ls_specific (target):
    s3 = boto3.resource('s3')
    bucket = s3.Bucket(target)
    for obj in bucket.objects.all():
-       print obj.key
+       print (obj.key)
 
    return 1
 
