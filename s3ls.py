@@ -1,5 +1,7 @@
 #!/usr/bin/env python
 
+from __future__ import print_function
+
 # Python code to provide a listing of available AWS S3 buckets or if
 # passed a command line argument, list the contents of that specific bucket
 
@@ -9,15 +11,39 @@ __copyright__   = "Copyright 2018"
 import sys
 import boto3
 import botocore
+import datetime
 
 # Display list of all S3 buckets associated with user credentials
 
 def s3ls_all():
 
+   now = datetime.datetime.now()
+
+   cw = boto3.client('cloudwatch')
    s3 = boto3.client('s3')
-   response = s3.list_buckets()
-   for bucket in response['Buckets']:
-       print ("%s %s" % (bucket['CreationDate'], bucket['Name']))
+
+   mybuckets = s3.list_buckets()
+
+   # Header Line for the output going to standard out
+   print('Bucket'.ljust(36) + 'Size in Bytes'.rjust(24))
+
+   for bucket in mybuckets['Buckets']:
+#       date = datetime.datetime.strptime(bucket['CreationDate'], "%Y-%m-%dT%H:%M:%S.%fZ").strftime('%m/%d/%Y')
+#       print ("{1:.32} {0}".format(date, bucket['Name']))
+        response = cw.get_metric_statistics(Namespace='AWS/S3',
+                   MetricName='BucketSizeBytes',
+                   Dimensions=[
+                           {'Name': 'BucketName', 'Value': bucket['Name']},
+                           {'Name': 'StorageType', 'Value': 'StandardStorage'}
+                           ],
+                   Statistics=['Average'],
+                   Period=3600,
+                   StartTime=(now-datetime.timedelta(days=1)).isoformat(),
+                   EndTime=now.isoformat()
+                   )
+
+        for item in response["Datapoints"]:
+             print(bucket["Name"].ljust(36) + str("{:,}".format(int(item["Average"]))).rjust(24))
 
    return 1
 
