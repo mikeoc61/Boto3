@@ -19,10 +19,10 @@ user selected profile and region
 __author__      = "Michael E. O'Connor"
 __copyright__   = "Copyright 2018"
 
-import os, sys
+import os
 from getpass import getpass
 from aws_regions import aws_regions
-from botocore.exceptions import ProfileNotFound
+from botocore.exceptions import ProfileNotFound, ClientError
 import botocore
 import boto3
 
@@ -98,14 +98,24 @@ def list_ec2_instances(profile, region):
     ec2 = session.resource('ec2', region_name=region)
     instances = ec2.instances.all()
 
-    for i in instances:
-        tags = { t['Key']: t['Value'] for t in i.tags or [] }
-        print(', '.join((
-            region, i.id, i.instance_type,
-            i.placement['AvailabilityZone'],
-            i.state['Name'], i.public_dns_name,
-            tags.get('Project', '<no tags>')
-            )))
+    try:
+        for i in instances:
+            tags = { t['Key']: t['Value'] for t in i.tags or [] }
+            print(', '.join((
+                region, i.id, i.instance_type,
+                i.placement['AvailabilityZone'],
+                i.state['Name'], i.public_dns_name,
+                tags.get('Project', '<no tags>')
+                )))
+
+    except ClientError as e:
+        if e.response['Error']['Code'] == "UnauthorizedOperation":
+            print ("Error: AWS_PROFILE=[{0}] does not have required permissions".format(profile))
+            print ("       Check IAM EC2 Access Policy associates with this user")
+        else:
+            print (e)
+        quit()
+
     return
 
 #-----------------------------------------
@@ -125,7 +135,7 @@ def main():
     # Confirm profile is valid by getting credentials from boto. If not, bail
 
     if check_credentials(session) == False:
-        sys.exit(1)
+        quit()
 
     # See if user wants (or needs) to change target Region
 

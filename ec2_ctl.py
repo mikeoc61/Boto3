@@ -32,7 +32,6 @@ __author__      = "Michael E. O'Connor"
 __copyright__   = "Copyright 2018"
 
 import os
-import sys
 import boto3
 import botocore
 import click
@@ -45,7 +44,7 @@ try:
     print ("Found AWS_PROFILE set to {0}".format(user_name))
 except KeyError:
     print ("Please set environment variable: AWS_PROFILE e.g. export AWS_PROFILE=<user account>")
-    sys.exit(1)
+    quit()
 
 session = boto3.Session(profile_name=user_name)
 ec2 = session.resource('ec2')
